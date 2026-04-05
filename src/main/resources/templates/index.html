@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desktop Launcher Application</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Desktop Launcher Application</h1>
+            <p>Smart Device Management System</p>
+        </header>
+
+        <div th:if="${message}" th:class="'alert alert-' + ${messageType}">
+            <span th:text="${message}"></span>
+        </div>
+
+        <div class="card">
+            <h2>Welcome!</h2>
+            <p>Manage users, applications, and menus for your smart device launcher system.</p>
+            
+            <div class="button-group">
+                <form method="post" action="/simulate" style="display: inline;">
+                    <button type="submit" class="btn btn-primary">
+                        🎲 Simulate Test Data
+                    </button>
+                </form>
+                <a href="/users" class="btn btn-success">
+                    👥 Manage Users
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Current Users (<span th:text="${#lists.size(users)}">0</span>)</h3>
+            <div th:if="${#lists.isEmpty(users)}" class="empty-state">
+                <p>No users yet. Click "Simulate Test Data" to populate with sample users.</p>
+            </div>
+            <div th:unless="${#lists.isEmpty(users)}" class="user-grid">
+                <div th:each="user : ${users}" class="user-card">
+                    <div class="user-avatar">👤</div>
+                    <h4 th:text="${user.name}">User Name</h4>
+                    <p class="user-id" th:text="${user.id}">user-id</p>
+                    <a th:href="@{/users/{id}(id=${user.id})}" class="btn btn-sm">View Details</a>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Desktop Launcher Application v1.0.0 | Created by Sheraz Dilbar</p>
+        </footer>
+    </div>
+</body>
+</html>

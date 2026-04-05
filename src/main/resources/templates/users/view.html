@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👤 User Details</h1>
+            <p>View user information and favorites</p>
+        </header>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 th:text="${user.name}">User Name</h2>
+                <a href="/users" class="btn btn-primary">← Back to Users</a>
+            </div>
+
+            <div class="user-details">
+                <p><strong>User ID:</strong> <span th:text="${user.id}">user-id</span></p>
+                <p><strong>Name:</strong> <span th:text="${user.name}">User Name</span></p>
+                <p><strong>Total Favorites:</strong> <span th:text="${#lists.size(favorites)}">0</span></p>
+            </div>
+
+            <h3>Favorite Applications</h3>
+            <div th:if="${#lists.isEmpty(favorites)}" class="empty-state">
+                <p>No favorite applications yet.</p>
+            </div>
+            <ul th:unless="${#lists.isEmpty(favorites)}" class="favorites-list">
+                <li th:each="app : ${favorites}">
+                    <div>
+                        <strong th:text="${app.name}">App Name</strong>
+                        <br>
+                        <small th:text="${app.iconName}">icon-name</small>
+                    </div>
+                    <span th:text="${app.executablePath}">path</span>
+                </li>
+            </ul>
+
+            <div class="button-group" style="margin-top: 20px;">
+                <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-success">Edit User</a>
+                <form method="post" th:action="@{/users/{id}/delete(id=${user.id})}" style="display: inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this user?')">Delete User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

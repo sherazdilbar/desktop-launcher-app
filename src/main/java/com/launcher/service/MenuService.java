@@ -5,23 +5,25 @@ import com.launcher.domain.Menu;
 import com.launcher.domain.MenuItem;
 import com.launcher.domain.User;
 import com.launcher.repository.*;
-import jakarta.persistence.EntityManager;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+@Service
+@Transactional
 public class MenuService {
     
-    private final EntityManager em;
     private final MenuRepository menuRepository;
     private final MenuItemRepository menuItemRepository;
     private final UserRepository userRepository;
     private final ApplicationRepository applicationRepository;
     
-    public MenuService(EntityManager em) {
-        this.em = em;
-        this.menuRepository = new MenuRepository(em);
-        this.menuItemRepository = new MenuItemRepository(em);
-        this.userRepository = new UserRepository(em);
-        this.applicationRepository = new ApplicationRepository(em);
+    public MenuService(MenuRepository menuRepository, MenuItemRepository menuItemRepository,
+                      UserRepository userRepository, ApplicationRepository applicationRepository) {
+        this.menuRepository = menuRepository;
+        this.menuItemRepository = menuItemRepository;
+        this.userRepository = userRepository;
+        this.applicationRepository = applicationRepository;
     }
     
     public Menu createMenu(String id, String name, String userId) {
@@ -31,10 +33,7 @@ public class MenuService {
         Menu menu = new Menu(id, name);
         menu.setUser(user);
         
-        em.getTransaction().begin();
-        menuRepository.save(menu);
-        em.getTransaction().commit();
-        return menu;
+        return menuRepository.save(menu);
     }
     
     public Menu createSubmenu(String id, String name, String parentMenuId) {
@@ -45,19 +44,14 @@ public class MenuService {
         submenu.setParentMenu(parentMenu);
         submenu.setUser(parentMenu.getUser());
         
-        em.getTransaction().begin();
-        menuRepository.save(submenu);
-        em.getTransaction().commit();
-        return submenu;
+        return menuRepository.save(submenu);
     }
     
     public void deleteMenu(String id) {
         Menu menu = menuRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Menu with ID '" + id + "' not found"));
         
-        em.getTransaction().begin();
         menuRepository.delete(menu);
-        em.getTransaction().commit();
     }
     
     public Menu getMenuById(String id) {
@@ -86,19 +80,14 @@ public class MenuService {
         menuItem.setMenu(menu);
         menuItem.setApplication(application);
         
-        em.getTransaction().begin();
-        menuItemRepository.save(menuItem);
-        em.getTransaction().commit();
-        return menuItem;
+        return menuItemRepository.save(menuItem);
     }
     
     public void removeMenuItem(String menuItemId) {
         MenuItem menuItem = menuItemRepository.findById(menuItemId)
             .orElseThrow(() -> new IllegalArgumentException("MenuItem with ID '" + menuItemId + "' not found"));
         
-        em.getTransaction().begin();
         menuItemRepository.delete(menuItem);
-        em.getTransaction().commit();
     }
     
     public List<MenuItem> getMenuItems(String menuId) {

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>👥 User Management</h1>
+            <p>Create, edit, and manage user accounts</p>
+        </header>
+
+        <div th:if="${message}" th:class="'alert alert-' + ${messageType}">
+            <span th:text="${message}"></span>
+        </div>
+
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2>All Users</h2>
+                <div>
+                    <a href="/users/new" class="btn btn-success">➕ Add New User</a>
+                    <a href="/" class="btn btn-primary">🏠 Home</a>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Favorites</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="user : ${users}">
+                        <td th:text="${user.id}">user-id</td>
+                        <td th:text="${user.name}">User Name</td>
+                        <td th:text="${#lists.size(user.favorites)}">0</td>
+                        <td>
+                            <a th:href="@{/users/{id}(id=${user.id})}" class="btn btn-sm btn-primary">View</a>
+                            <a th:href="@{/users/{id}/edit(id=${user.id})}" class="btn btn-sm btn-success">Edit</a>
+                            <form method="post" th:action="@{/users/{id}/delete(id=${user.id})}" style="display: inline;">
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

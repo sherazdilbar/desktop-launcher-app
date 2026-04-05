@@ -4,27 +4,25 @@ import com.launcher.domain.Avatar;
 import com.launcher.domain.Wallpaper;
 import com.launcher.repository.AvatarRepository;
 import com.launcher.repository.WallpaperRepository;
-import jakarta.persistence.EntityManager;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
+@Service
+@Transactional
 public class AssetService {
     
-    private final EntityManager em;
     private final WallpaperRepository wallpaperRepository;
     private final AvatarRepository avatarRepository;
     
-    public AssetService(EntityManager em) {
-        this.em = em;
-        this.wallpaperRepository = new WallpaperRepository(em);
-        this.avatarRepository = new AvatarRepository(em);
+    public AssetService(WallpaperRepository wallpaperRepository, AvatarRepository avatarRepository) {
+        this.wallpaperRepository = wallpaperRepository;
+        this.avatarRepository = avatarRepository;
     }
     
     public Wallpaper createWallpaper(String id, String name, String imagePath) {
         Wallpaper wallpaper = new Wallpaper(id, name, imagePath);
-        em.getTransaction().begin();
-        wallpaperRepository.save(wallpaper);
-        em.getTransaction().commit();
-        return wallpaper;
+        return wallpaperRepository.save(wallpaper);
     }
     
     public void deleteWallpaper(String id) {
@@ -36,9 +34,7 @@ public class AssetService {
                 wallpaper.getUsers().size() + " user(s)");
         }
         
-        em.getTransaction().begin();
         wallpaperRepository.delete(wallpaper);
-        em.getTransaction().commit();
     }
     
     public List<Wallpaper> getAllWallpapers() {
@@ -47,10 +43,7 @@ public class AssetService {
     
     public Avatar createAvatar(String id, String name, String imagePath) {
         Avatar avatar = new Avatar(id, name, imagePath);
-        em.getTransaction().begin();
-        avatarRepository.save(avatar);
-        em.getTransaction().commit();
-        return avatar;
+        return avatarRepository.save(avatar);
     }
     
     public void deleteAvatar(String id) {
@@ -62,9 +55,7 @@ public class AssetService {
                 avatar.getUsers().size() + " user(s)");
         }
         
-        em.getTransaction().begin();
         avatarRepository.delete(avatar);
-        em.getTransaction().commit();
     }
     
     public List<Avatar> getAllAvatars() {

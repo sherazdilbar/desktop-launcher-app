@@ -5,23 +5,28 @@ import com.launcher.domain.Avatar;
 import com.launcher.domain.User;
 import com.launcher.domain.Wallpaper;
 import com.launcher.repository.*;
-import jakarta.persistence.EntityManager;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
+@Service
+@Transactional
 public class UserService {
     
-    private final EntityManager em;
     private final UserRepository userRepository;
     private final WallpaperRepository wallpaperRepository;
     private final AvatarRepository avatarRepository;
     private final ApplicationRepository applicationRepository;
     
-    public UserService(EntityManager em) {
-        this.em = em;
-        this.userRepository = new UserRepository(em);
-        this.wallpaperRepository = new WallpaperRepository(em);
-        this.avatarRepository = new AvatarRepository(em);
-        this.applicationRepository = new ApplicationRepository(em);
+    public UserService(UserRepository userRepository,
+                      WallpaperRepository wallpaperRepository,
+                      AvatarRepository avatarRepository,
+                      ApplicationRepository applicationRepository) {
+        this.userRepository = userRepository;
+        this.wallpaperRepository = wallpaperRepository;
+        this.avatarRepository = avatarRepository;
+        this.applicationRepository = applicationRepository;
     }
     
     public User createUser(String id, String name) {
@@ -30,10 +35,7 @@ public class UserService {
         }
         
         User user = new User(id, name);
-        em.getTransaction().begin();
-        userRepository.save(user);
-        em.getTransaction().commit();
-        return user;
+        return userRepository.save(user);
     }
     
     public User updateUser(String id, String name) {
@@ -41,19 +43,14 @@ public class UserService {
             .orElseThrow(() -> new IllegalArgumentException("User with ID '" + id + "' not found"));
         
         user.setName(name);
-        em.getTransaction().begin();
-        userRepository.save(user);
-        em.getTransaction().commit();
-        return user;
+        return userRepository.save(user);
     }
     
     public void deleteUser(String id) {
         User user = userRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("User with ID '" + id + "' not found"));
         
-        em.getTransaction().begin();
         userRepository.delete(user);
-        em.getTransaction().commit();
     }
     
     public User getUserById(String id) {
@@ -71,9 +68,7 @@ public class UserService {
             .orElseThrow(() -> new IllegalArgumentException("Wallpaper with ID '" + wallpaperId + "' not found"));
         
         user.setWallpaper(wallpaper);
-        em.getTransaction().begin();
         userRepository.save(user);
-        em.getTransaction().commit();
     }
     
     public void setAvatar(String userId, String avatarId) {
@@ -82,9 +77,7 @@ public class UserService {
             .orElseThrow(() -> new IllegalArgumentException("Avatar with ID '" + avatarId + "' not found"));
         
         user.setAvatar(avatar);
-        em.getTransaction().begin();
         userRepository.save(user);
-        em.getTransaction().commit();
     }
     
     public void addFavorite(String userId, String applicationId) {
@@ -92,10 +85,8 @@ public class UserService {
         Application application = applicationRepository.findById(applicationId)
             .orElseThrow(() -> new IllegalArgumentException("Application with ID '" + applicationId + "' not found"));
         
-        em.getTransaction().begin();
         user.addFavorite(application);
         userRepository.save(user);
-        em.getTransaction().commit();
     }
     
     public void removeFavorite(String userId, String applicationId) {
@@ -103,10 +94,8 @@ public class UserService {
         Application application = applicationRepository.findById(applicationId)
             .orElseThrow(() -> new IllegalArgumentException("Application with ID '" + applicationId + "' not found"));
         
-        em.getTransaction().begin();
         user.removeFavorite(application);
         userRepository.save(user);
-        em.getTransaction().commit();
     }
     
     public List<Application> getFavorites(String userId) {

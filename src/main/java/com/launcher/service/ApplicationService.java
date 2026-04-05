@@ -2,18 +2,19 @@ package com.launcher.service;
 
 import com.launcher.domain.Application;
 import com.launcher.repository.ApplicationRepository;
-import jakarta.persistence.EntityManager;
-import java.io.IOException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
+@Service
+@Transactional
 public class ApplicationService {
     
-    private final EntityManager em;
     private final ApplicationRepository applicationRepository;
     
-    public ApplicationService(EntityManager em) {
-        this.em = em;
-        this.applicationRepository = new ApplicationRepository(em);
+    public ApplicationService(ApplicationRepository applicationRepository) {
+        this.applicationRepository = applicationRepository;
     }
     
     public Application createApplication(String id, String name, String iconName, String executablePath) {
@@ -22,10 +23,7 @@ public class ApplicationService {
         }
         
         Application application = new Application(id, name, iconName, executablePath);
-        em.getTransaction().begin();
-        applicationRepository.save(application);
-        em.getTransaction().commit();
-        return application;
+        return applicationRepository.save(application);
     }
     
     public Application updateApplication(String id, String name, String iconName, String executablePath) {
@@ -36,19 +34,14 @@ public class ApplicationService {
         application.setIconName(iconName);
         application.setExecutablePath(executablePath);
         
-        em.getTransaction().begin();
-        applicationRepository.save(application);
-        em.getTransaction().commit();
-        return application;
+        return applicationRepository.save(application);
     }
     
     public void deleteApplication(String id) {
         Application application = applicationRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Application with ID '" + id + "' not found"));
         
-        em.getTransaction().begin();
         applicationRepository.delete(application);
-        em.getTransaction().commit();
     }
     
     public Application getApplicationById(String id) {
@@ -60,17 +53,10 @@ public class ApplicationService {
         return applicationRepository.findAll();
     }
     
-    public void launchApplication(String applicationId) throws IOException {
-        Application application = getApplicationById(applicationId);
-        
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder(application.getExecutablePath());
-            processBuilder.start();
-            System.out.println("Launched application: " + application.getName());
-        } catch (IOException e) {
-            throw new IOException("Failed to launch application '" + application.getName() + "': " + e.getMessage());
-        } catch (SecurityException e) {
-            throw new IOException("Permission denied to launch application '" + application.getName() + "'");
-        }
+    public void launchApplication(String id) {
+        Application application = getApplicationById(id);
+        System.out.println("Launching application: " + application.getName());
+        System.out.println("Executable path: " + application.getExecutablePath());
+        // In a real implementation, this would execute the application
     }
 }

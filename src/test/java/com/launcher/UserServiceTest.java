@@ -1,27 +1,18 @@
 package com.launcher;
 
 import com.launcher.domain.User;
-import com.launcher.repository.EntityManagerProvider;
 import com.launcher.service.UserService;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 public class UserServiceTest {
     
-    private static EntityManager em;
+    @Autowired
     private UserService userService;
-    
-    @BeforeAll
-    public static void setupClass() {
-        em = EntityManagerProvider.getEntityManager();
-    }
-    
-    @BeforeEach
-    public void setup() {
-        userService = new UserService(em);
-    }
     
     @Test
     public void testCreateUser() {
@@ -64,10 +55,5 @@ public class UserServiceTest {
         assertThrows(IllegalArgumentException.class, () -> {
             userService.createUser(userId, "Duplicate User");
         });
-    }
-    
-    @AfterAll
-    public static void teardownClass() {
-        EntityManagerProvider.close();
     }
 }
